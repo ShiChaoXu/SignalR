@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>聊天室列表</title>
+
+    <link href="Content/themes/base/bootstarp.min.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div class="container" style="border:1px solid red;">
+        <div class="row form-group">
+            <form>
+                <div class="form-group">
+                    <label for="exampleInputName">NickName</label>
+                    <input type="text" class="form-control" id="exampleInputName" placeholder="NickName can not support Chinese" disabled="disabled">
+                </div>
+                <div class="form-group">
+                    <label>ZoomList</label>
+                    <select class="form-control" id="exampleInputZoom">
+                        
+                    </select>
+                </div>
+                <button type="button" id="submit" class="btn btn-default">Submit</button>
+            </form>
+        </div>
+    </div>
+    <script src="Scripts/jquery-3.4.1.min.js"></script>
+    <script src="Scripts/bootstarp.min.js"></script>
+    <script src="Scripts/jquery.signalR-2.2.2.min.js"></script>
+    <script src="signalr/hubs"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            var zoom = $.connection.zoomChatHub;
+            zoom.client.updateZoom = function (ZoomDic, UserDic) {
+                top.ZoomDic = ZoomDic;
+                top.UserDic = UserDic;
+                ZoomDic.forEach(item => {
+                    $(`<option value="${item.Key}">${item.Value}</option>`).appendTo($("#exampleInputZoom"));
+                });
+            };
+            zoom.client.syncUser = function (type, msg, data) {
+                if (true) {
+                    top.UserDic = data;
+                    var transUser = encodeURI($("#exampleInputName").val());
+                    window.location.href = window.location.origin + "/ChatZoom.html?zoomID=" + $("#exampleInputZoom").val() + "&uname=" + transUser ;
+                } else {
+                    alert(msg);
+                }
+            };
+            zoom.client.systemMsg = function (msg) {
+                console.log(msg);
+            };
+       
+
+            var _nickName = prompt("Please input your nickname");
+            if (!_nickName) {
+                alert("Please input valid ninkname.");
+                window.location.href = window.location.href;
+            } else {
+                $("#exampleInputName").val(_nickName);
+            }
+            $.connection.hub.start().done(function () {
+                zoom.server.login(_nickName)
+            });
+
+            $("#submit").click(function () {
+                var zoomID = $("#exampleInputZoom").val();
+                zoom.server.joinZoom(zoomID);
+                
+            });
+         
+
+        });
+    </script>
+</body>
+
+</html>

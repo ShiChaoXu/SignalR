@@ -1,0 +1,4 @@
+packages/
+SignalChat/bin/app.publish/
+SignalChat/obj/
+WebChat/obj/
